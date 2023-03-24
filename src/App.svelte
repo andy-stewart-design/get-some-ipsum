@@ -20,7 +20,7 @@
     <p class="text-xs text-center max-w-[200px]">Generate the perfect amount of text to fit the layer’s frame</p>
     <button
       class="w-full bg-gradient-to-r from-blue-700 to-purple-700 rounded py-2 px-2"
-      on:click={() => postMsg("foo")}
+      on:click={() => postMsg("AUTO")}
     >
       Autogenerate
     </button>
@@ -39,7 +39,7 @@
         stroke-dasharray="8 8"
       />
     </svg>
-    <p class="text-xs text-white/60 text-center max-w-[200px]">Select at least one text layer to update</p>
+    <p class="text-xs text-white/60 text-center max-w-[160px]">Select at least one text layer to update</p>
   {/if}
 </div>
 
