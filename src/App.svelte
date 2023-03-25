@@ -1,7 +1,13 @@
 <script lang="ts">
   import "./app.css"
+  import Listbox from "./components/Listbox.svelte"
+  import { ListboxOption, Message } from "./types/main"
 
-  const postMsg = (type: string) => parent.postMessage({ pluginMessage: { type } }, "*")
+  interface Options {
+    [key: string]: string | number | boolean
+  }
+
+  const postMsg = (type: Message, options?: Options) => parent.postMessage({ pluginMessage: { type, ...options } }, "*")
 
   let elementIsSelected: boolean
   let selectionIsText: boolean
@@ -13,17 +19,37 @@
       selectionIsText = event.data.pluginMessage.isTextSelected
     }
   }
+
+  let amount: number = 5
+  let selectedItem: ListboxOption
+  const categories: ListboxOption[] = [
+    { value: "WORDS", text: "Words" },
+    { value: "CHARACTERS", text: "Characters" },
+    { value: "PARAGRAPHS", text: "Paragraphs" },
+  ]
 </script>
 
-<div class="flex flex-col justify-center items-center gap-4 w-full h-full p-4">
+<div class="flex flex-col justify-center items-center w-full h-full p-4">
   {#if showUI}
-    <p class="text-xs text-center max-w-[200px]">Generate the perfect amount of text to fit the layer’s frame</p>
-    <button
-      class="w-full bg-gradient-to-r from-blue-700 to-purple-700 rounded py-2 px-2"
-      on:click={() => postMsg("AUTO")}
+    <div
+      class="grow flex flex-col justify-center items-center gap-4 w-full border-b border-gray-900/10 dark:border-white/10"
     >
-      Autogenerate
-    </button>
+      <div class="flex w-full gap-2">
+        <input
+          class="w-20 bg-transparent border border-gray-900/10 dark:border-white/10 px-2"
+          type="number"
+          bind:value={amount}
+        />
+        <Listbox bind:selectedItem {categories} />
+      </div>
+      <button class="w-full bg-figma-blue py-2 px-2" on:click={() => postMsg(selectedItem.value, { amount })}>
+        Generate
+      </button>
+    </div>
+    <div class="grow flex flex-col justify-center items-center gap-4 w-full">
+      <p class="text-xs text-center max-w-[200px]">Generate the perfect amount of text to fit the layer’s frame</p>
+      <button class="w-full bg-figma-blue py-2 px-2" on:click={() => postMsg("AUTO")}> Autogenerate </button>
+    </div>
   {:else}
     <svg class="opacity-40" width="80" height="80" viewBox="0 0 260 260" fill="none" xmlns="http://www.w3.org/2000/svg">
       <path class="cursor" d="M192 192L212 252L222.833 222.833L252 212L192 192Z" fill="currentColor" />
@@ -39,7 +65,9 @@
         stroke-dasharray="8 8"
       />
     </svg>
-    <p class="text-xs text-white/60 text-center max-w-[160px]">Select at least one text layer to update</p>
+    <p class="text-xs text-gray-900/60 dark:text-white/60 text-center max-w-[160px]">
+      Select at least one text layer to update
+    </p>
   {/if}
 </div>
 

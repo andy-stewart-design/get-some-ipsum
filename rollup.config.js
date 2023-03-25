@@ -9,7 +9,6 @@ import svg from "rollup-plugin-svg"
 
 // Post CSS
 import postcss from "rollup-plugin-postcss"
-import cssnano from "cssnano"
 import tailwind from "tailwindcss"
 
 const production = !process.env.ROLLUP_WATCH
@@ -36,28 +35,18 @@ export default [
       resolve({
         browser: true,
         dedupe: (importee) => importee === `svelte` || importee.startsWith(`svelte/`),
+        extensions: [".svelte", ".mjs", ".js", ".json", ".node"],
       }),
       commonjs(),
       svg(),
       postcss({
         extensions: [`.css`],
-        plugins: [cssnano(), tailwind()],
+        plugins: [tailwind()],
       }),
       html({
         fileName: `ui.html`,
         template({ bundle }) {
-          return `
-          <!doctype html>
-          <html lang="en">
-            <head>
-              <meta charset="utf-8">
-              <title>Figma Plugin Example</title>
-            </head>
-            <body>
-              <script>${bundle[`bundle.js`].code}</script>
-            </body>
-          </html>
-          `
+          return createTemplate(bundle)
         },
       }),
       production && terser(),
@@ -83,3 +72,10 @@ export default [
     ],
   },
 ]
+
+function createTemplate(bundle) {
+  const title = "Figma Plugin Starter"
+  return `<!doctype html><html lang="en">
+          <head><meta charset="utf-8"><title>${title}</title></head>
+          <body><script>${bundle[`bundle.js`].code}</script></body></html>`
+}

@@ -7,7 +7,6 @@ specifiers:
   '@rollup/plugin-node-resolve': ^15.0.1
   '@rollup/plugin-terser': ^0.4.0
   '@rollup/plugin-typescript': ^11.0.0
-  cssnano: ^5.1.15
   figma-plugin-ds-svelte: ^1.4.3
   lorem-ipsum: ^2.0.8
   postcss: ^8.4.21
@@ -34,7 +33,6 @@ devDependencies:
   '@rollup/plugin-node-resolve': 15.0.1_rollup@3.20.1
   '@rollup/plugin-terser': 0.4.0_rollup@3.20.1
   '@rollup/plugin-typescript': 11.0.0_eacmbhuh3lqetrbtumripnqatm
-  cssnano: 5.1.15_postcss@8.4.21
   figma-plugin-ds-svelte: 1.4.3
   postcss: 8.4.21
   prettier: 2.8.6

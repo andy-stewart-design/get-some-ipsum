@@ -1,4 +1,5 @@
 import { LoremIpsum } from "lorem-ipsum"
+import { Message } from "../types/main"
 
 const lorem = new LoremIpsum({
   sentencesPerParagraph: {
@@ -11,7 +12,30 @@ const lorem = new LoremIpsum({
   },
 })
 
-export function getSomeIpsum(maxChars: number) {
+export function generateIpsum() {}
+
+export function manualGenerate(type: Message, amount: number) {
+  let ipsum: string | undefined
+  if (type === "WORDS") {
+    const result = lorem.generateWords(amount)
+    const words = result.split(" ")
+    ipsum = paragraphFromArray(words)
+    // console.log(ipsum)
+  } else if (type === "PARAGRAPHS") {
+    // splitting at single line break and converting to double line break
+    ipsum = lorem
+      .generateParagraphs(amount)
+      .split(/\r?\n|\r|\n/g)
+      .join("\n\n")
+    // console.log(ipsum.split(/\r?\n|\r|\n/g))
+  } else if (type === "CHARACTERS") {
+    ipsum = autoGenerate(amount)
+    // console.log(ipsum)
+  }
+  if (ipsum) return ipsum
+}
+
+export function autoGenerate(maxChars: number) {
   // adjusting for the average characters in a sentence
   const chars = maxChars - Math.ceil(maxChars / 60)
   // generating a substantially long array of words
@@ -30,8 +54,11 @@ export function getSomeIpsum(maxChars: number) {
     }
   }
 
+  return paragraphFromArray(words)
+}
+
+function paragraphFromArray(words: string[]) {
   let wordIndex = 0
-  let testIndex = 0
   while (wordIndex < words.length) {
     const max = 14
     const min = 4
@@ -41,7 +68,6 @@ export function getSomeIpsum(maxChars: number) {
     if (sentenceTooLong || tooFewWordsLeft) break
     wordIndex += index
     words[wordIndex] = words[wordIndex] + "."
-    testIndex++
   }
 
   const sentence = (words.join(" ") + ".").replace("..", ".")
