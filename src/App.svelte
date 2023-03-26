@@ -20,12 +20,13 @@
     }
   }
 
-  let amount: number = 5
+  let amountIsDefault = true
+  let amount: number = 25
   let selectedItem: ListboxOption
   const categories: ListboxOption[] = [
-    { value: "WORDS", text: "Words" },
-    { value: "CHARACTERS", text: "Characters" },
-    { value: "PARAGRAPHS", text: "Paragraphs" },
+    { value: "WORDS", text: "Words", defaultAmount: 25 },
+    { value: "CHARACTERS", text: "Characters", defaultAmount: 100 },
+    { value: "PARAGRAPHS", text: "Paragraphs", defaultAmount: 2 },
   ]
 </script>
 
@@ -39,8 +40,13 @@
           class="w-20 bg-transparent border border-gray-900/10 dark:border-white/10 px-2"
           type="number"
           bind:value={amount}
+          on:input={() => amountIsDefault && (amountIsDefault = false)}
         />
-        <Listbox bind:selectedItem {categories} />
+        <Listbox
+          bind:selectedItem
+          on:change={() => amountIsDefault && (amount = selectedItem.defaultAmount)}
+          {categories}
+        />
       </div>
       <button class="w-full bg-figma-blue py-2 px-2" on:click={() => postMsg(selectedItem.value, { amount })}>
         Generate

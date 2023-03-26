@@ -12,30 +12,32 @@ const lorem = new LoremIpsum({
   },
 })
 
-export function generateIpsum() {}
-
-export function manualGenerate(type: Message, amount: number) {
-  let ipsum: string | undefined
-  if (type === "WORDS") {
-    const result = lorem.generateWords(amount)
-    const words = result.split(" ")
-    ipsum = paragraphFromArray(words)
-    // console.log(ipsum)
-  } else if (type === "PARAGRAPHS") {
-    // splitting at single line break and converting to double line break
-    ipsum = lorem
-      .generateParagraphs(amount)
-      .split(/\r?\n|\r|\n/g)
-      .join("\n\n")
-    // console.log(ipsum.split(/\r?\n|\r|\n/g))
-  } else if (type === "CHARACTERS") {
-    ipsum = autoGenerate(amount)
-    // console.log(ipsum)
+export function generateIpsum(type: Message, amount: number) {
+  if (amount) {
+    if (type === "WORDS" || type === "PARAGRAPHS" || type === "CHARACTERS") {
+      let ipsum: string | undefined
+      if (type === "WORDS") {
+        const result = lorem.generateWords(amount)
+        const words = result.split(" ")
+        ipsum = paragraphFromArray(words)
+      } else if (type === "PARAGRAPHS") {
+        ipsum = lorem
+          .generateParagraphs(amount)
+          .split(/\r?\n|\r|\n/g)
+          .join("\n\n")
+      } else if (type === "CHARACTERS") {
+        ipsum = autoGenerate(amount)
+      }
+      if (ipsum) return ipsum
+    } else if (type === "AUTO") {
+      return autoGenerate(amount)
+    }
+  } else {
+    console.error(`Get Some Ipsum: must provide amount to generate ${type.toLocaleLowerCase()}`)
   }
-  if (ipsum) return ipsum
 }
 
-export function autoGenerate(maxChars: number) {
+function autoGenerate(maxChars: number) {
   // adjusting for the average characters in a sentence
   const chars = maxChars - Math.ceil(maxChars / 60)
   // generating a substantially long array of words

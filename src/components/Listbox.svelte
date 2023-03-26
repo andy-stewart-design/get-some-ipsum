@@ -1,6 +1,9 @@
 <script lang="ts">
+  import { createEventDispatcher } from "svelte"
   import { ListboxOption } from "../types/main"
   import { focusOnMount } from "../utils/focusOnMount"
+
+  const dispatch = createEventDispatcher()
 
   let activeItem: number = 0
   export let categories: ListboxOption[]
@@ -32,6 +35,7 @@
   const decActiveItem = (): number => (activeItem <= 0 ? (activeItem = len) : (activeItem -= 1))
   const updateSelected = (): void => {
     selectedItem = categories[activeItem]
+    dispatch("change")
     setTimeout(() => {
       toggleOpenState()
     }, 0)
