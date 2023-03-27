@@ -2,6 +2,8 @@
   import { createEventDispatcher } from "svelte"
   import { ListboxOption } from "../types/main"
   import { focusOnMount } from "../utils/focusOnMount"
+  import expand from "../svgs/expand.svg"
+  import collapse from "../svgs/collapse.svg"
 
   const dispatch = createEventDispatcher()
 
@@ -70,17 +72,24 @@
   <button
     bind:this={listboxButton}
     on:click={toggleOpenState}
-    class="relative w-full text-left py-1.5 px-2 border border-gray-900/10 dark:border-white/10"
-    class:btn-isActive={isOpen}
+    class="relative flex w-full items-center text-left py-1.5 px-2 border border-gray-900/10 dark:border-white/10 focus:border-blue-600 dark:focus:border-blue-600  active:border-blue-600 dark:active:border-blue-600"
+    class:active={isOpen}
     type="button"
     aria-haspopup="true"
     aria-expanded="false"
   >
-    {selectedItem.text}
+    <span class="inline-block grow">{selectedItem.text}</span>
+    <span class="inline-block">
+      {#if isOpen}
+        {@html collapse}
+      {:else}
+        {@html expand}
+      {/if}
+    </span>
   </button>
   {#if isOpen}
     <div
-      class="absolute top-10 left-0 bg-white dark:bg-figma-gray-900 border border-gray-900/10 dark:border-white/10 shadow-lg w-full z-10 overflow-hidden"
+      class="absolute top-10 left-0 bg-white dark:bg-figma-gray-900 border border-gray-900/10 dark:border-white/10 shadow-lg w-full z-10 overflow-hidden "
       role="listbox"
       aria-orientation="vertical"
       tabindex="0"

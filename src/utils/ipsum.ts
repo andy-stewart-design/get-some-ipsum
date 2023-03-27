@@ -1,5 +1,5 @@
 import { LoremIpsum } from "lorem-ipsum"
-import { Message } from "../types/main"
+import { MessageType } from "../types/main"
 
 const lorem = new LoremIpsum({
   sentencesPerParagraph: {
@@ -12,7 +12,7 @@ const lorem = new LoremIpsum({
   },
 })
 
-export function generateIpsum(type: Message, amount: number) {
+export function generateIpsum(type: MessageType, amount: number) {
   if (amount) {
     if (type === "WORDS" || type === "PARAGRAPHS" || type === "CHARACTERS") {
       let ipsum: string | undefined
@@ -38,9 +38,7 @@ export function generateIpsum(type: Message, amount: number) {
 }
 
 function autoGenerate(maxChars: number) {
-  // adjusting for the average characters in a sentence
   const chars = maxChars - Math.ceil(maxChars / 60)
-  // generating a substantially long array of words
   const ipsum = lorem.generateWords(maxChars * 10).split(" ")
   let currentChars = 0
   const words = []

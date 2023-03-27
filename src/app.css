@@ -9,3 +9,9 @@
 .figma-dark {
   @apply bg-figma-gray-700 text-white;
 }
+
+button:focus,
+input:focus,
+div:focus {
+  @apply outline-none;
+}

@@ -1,17 +1,24 @@
 <script lang="ts">
   import "./app.css"
+  import FallbackUi from "./components/FallbackUI.svelte"
   import Listbox from "./components/Listbox.svelte"
-  import { ListboxOption, Message } from "./types/main"
-
-  interface Options {
-    [key: string]: string | number | boolean
-  }
-
-  const postMsg = (type: Message, options?: Options) => parent.postMessage({ pluginMessage: { type, ...options } }, "*")
+  import { ListboxOption, MessageType } from "./types/main"
 
   let elementIsSelected: boolean
   let selectionIsText: boolean
   $: showUI = elementIsSelected && selectionIsText
+
+  let amountIsDefault = true
+  let amount: number = 25
+
+  let selectedItem: ListboxOption
+  const categories: ListboxOption[] = [
+    { value: "WORDS", text: "Words", defaultAmount: 25 },
+    { value: "CHARACTERS", text: "Characters", defaultAmount: 100 },
+    { value: "PARAGRAPHS", text: "Paragraphs", defaultAmount: 2 },
+  ]
+
+  const postMsg = (type: MessageType, amount?: number) => parent.postMessage({ pluginMessage: { type, amount } }, "*")
 
   onmessage = (event) => {
     if (event.data.pluginMessage.selectedElementCount !== undefined) {
@@ -19,15 +26,6 @@
       selectionIsText = event.data.pluginMessage.isTextSelected
     }
   }
-
-  let amountIsDefault = true
-  let amount: number = 25
-  let selectedItem: ListboxOption
-  const categories: ListboxOption[] = [
-    { value: "WORDS", text: "Words", defaultAmount: 25 },
-    { value: "CHARACTERS", text: "Characters", defaultAmount: 100 },
-    { value: "PARAGRAPHS", text: "Paragraphs", defaultAmount: 2 },
-  ]
 </script>
 
 <div class="flex flex-col justify-center items-center w-full h-full p-4">
@@ -37,7 +35,7 @@
     >
       <div class="flex w-full gap-2">
         <input
-          class="w-20 bg-transparent border border-gray-900/10 dark:border-white/10 px-2"
+          class="w-20 bg-transparent border border-gray-900/10 dark:border-white/10 px-2 dark:focus:border-blue-600 selection:bg-figma-gray-800"
           type="number"
           bind:value={amount}
           on:input={() => amountIsDefault && (amountIsDefault = false)}
@@ -48,65 +46,23 @@
           {categories}
         />
       </div>
-      <button class="w-full bg-figma-blue py-2 px-2" on:click={() => postMsg(selectedItem.value, { amount })}>
+      <button
+        class="w-full bg-blue-600 py-2 px-2 focus:outline-blue-600 focus:outline-1"
+        on:click={() => postMsg(selectedItem.value, amount)}
+      >
         Generate
       </button>
     </div>
     <div class="grow flex flex-col justify-center items-center gap-4 w-full">
       <p class="text-xs text-center max-w-[200px]">Generate the perfect amount of text to fit the layer’s frame</p>
-      <button class="w-full bg-figma-blue py-2 px-2" on:click={() => postMsg("AUTO")}> Autogenerate </button>
+      <button
+        class="w-full bg-blue-600 py-2 px-2 focus:outline-blue-600 focus:outline-1"
+        on:click={() => postMsg("AUTO")}
+      >
+        Autogenerate
+      </button>
     </div>
   {:else}
-    <svg class="opacity-40" width="80" height="80" viewBox="0 0 260 260" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <path class="cursor" d="M192 192L212 252L222.833 222.833L252 212L192 192Z" fill="currentColor" />
-      <rect
-        class="selection"
-        x="9"
-        y="9"
-        width="200"
-        height="200"
-        stroke="currentColor"
-        stroke-width="4"
-        stroke-miterlimit="2.61313"
-        stroke-dasharray="8 8"
-      />
-    </svg>
-    <p class="text-xs text-gray-900/60 dark:text-white/60 text-center max-w-[160px]">
-      Select at least one text layer to update
-    </p>
+    <FallbackUi />
   {/if}
 </div>
-
-<style>
-  .cursor {
-    animation: cursor 2.5s infinite alternate cubic-bezier(0.65, 0, 0.35, 1);
-  }
-
-  .selection {
-    animation: select 2.5s infinite alternate cubic-bezier(0.65, 0, 0.35, 1);
-  }
-
-  @keyframes cursor {
-    0%,
-    20% {
-      translate: -160px -160px;
-    }
-    80%,
-    100% {
-      translate: 0px 0px;
-    }
-  }
-
-  @keyframes select {
-    0%,
-    20% {
-      width: 40px;
-      height: 40px;
-    }
-    80%,
-    100% {
-      width: 200px;
-      height: 200px;
-    }
-  }
-</style>
