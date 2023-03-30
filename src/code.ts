@@ -1,67 +1,116 @@
-// Import Message type and generateIpsum function from their respective modules
-import { Message, MessageType } from "./types/main"
+// TODO: Check for locked layers
+// TODO: Figure out how to integrate quick actions into plugin
+
+import { Message } from "./types/main"
 import { generateIpsum } from "./utils/ipsum"
 
-// When the plugin opens, check if any text elements are selected and update the UI
 figma.on("run", () => updateActiveSelection())
 
-// When the active selection changes, check if any text elements are selected and update the UI
 figma.on("selectionchange", () => updateActiveSelection())
 
-// Open the figma ui
 figma.showUI(__html__, { themeColors: true, width: 320, height: 400 })
 
-// Handle incoming messages from the UI
 figma.ui.onmessage = async (msg: Message) => {
-  const { type, amount } = msg
   const nodes = figma.currentPage.selection
-  let textNodeCount = 0
-  // For each selected text node, replace the text with lorem ipsum text
+  const textNodes = getTextNodes(nodes)
+  await updateTextNodes(msg, textNodes)
+
+  figma.closePlugin(addToast(textNodes))
+}
+
+// -----------------------------------------------------------------
+// HELPER FUNCTIONS
+// -----------------------------------------------------------------
+
+const updateActiveSelection = () => {
+  const textNodeCount = getTextNodes(figma.currentPage.selection).length
+  figma.ui.postMessage({ textNodeCount })
+}
+
+const updateTextNodes = async (msg: Message, nodes: TextNode[]) => {
   for (const node of nodes) {
-    if (node.type === "TEXT") {
-      // Load fonts asynchronously
-      textNodeCount++
-      await Promise.all(node.getRangeAllFontNames(0, node.characters.length).map(figma.loadFontAsync))
-      if (type === "AUTO") {
+    await loadFonts(node)
+    const initialOpacity = node.opacity
+    node.opacity = 0
+
+    if (msg.type === "AUTO") {
+      if (node.textAutoResize === "HEIGHT") {
         // Replace text repeatedly until the height stabilizes
-        const initialOpacity = node.opacity
         const initialHeight = node.height
         const initialChars = node.characters
+
         let isLooping = true
-        node.opacity = 0
         while (isLooping) {
-          replaceText(type, node, initialChars.length)
+          const ipsum = generateIpsum(msg.type, initialChars.length)
+          node.characters = ipsum
           const finalHeight = node.height
           if (initialHeight === finalHeight) isLooping = false
         }
-        node.opacity = initialOpacity
-      } else if (type === "WORDS" || type === "CHARACTERS" || type === "PARAGRAPHS") {
-        // Replace text with a specific number of words, characters, or paragraphs
-        replaceText(type, node, amount)
+      } else if (node.textAutoResize === "NONE" || node.textAutoResize === "TRUNCATE") {
+        const charCount = getFreeformCharCount(node)
+        const ipsum = generateIpsum(msg.type, charCount)
+        node.characters = ipsum
+      } else if (node.textAutoResize === "WIDTH_AND_HEIGHT") {
+        const ipsum = generateIpsum(msg.type, node.characters.length)
+        node.characters = ipsum
       }
+    } else if (msg.type === "WORDS" || msg.type === "CHARACTERS" || msg.type === "PARAGRAPHS") {
+      // Replace text with a specific number of words, characters, or paragraphs
+      const ipsum = generateIpsum(msg.type, msg.amount)
+      node.characters = ipsum
     }
+    node.opacity = initialOpacity
   }
-
-  // Close the plugin
-  const message = textNodeCount <= 1 ? `Updated ${textNodeCount} copy block` : `Updated ${textNodeCount} copy blocks`
-  figma.closePlugin(message)
 }
 
-// Helper function to replace text with generated lorem ipsum text
-const replaceText = (type: MessageType, node: TextNode, chars: number) => {
-  const ipsum = generateIpsum(type, chars)
+const getTextNodes = (nodes: SceneNode[] | readonly SceneNode[]) => {
+  return nodes.filter((n) => n.type === "TEXT") as TextNode[]
+}
+
+const loadFonts = async (node: TextNode) => {
+  await Promise.all(node.getRangeAllFontNames(0, node.characters.length).map(figma.loadFontAsync))
+}
+
+const addToast = (nodes: TextNode[]) => {
+  return `Updated ${nodes.length} copy block` + (nodes.length > 1 ? "s" : "")
+}
+
+const getFreeformCharCount = (node: TextNode) => {
+  const node_width = node.width
+  const node_height = node.height
+  const ipsum = generateIpsum("AUTO", node_width)
   node.characters = ipsum
-}
+  const word_array = node.characters.split(" ")
 
-const updateActiveSelection = () => {
-  let isTextSelected = false
-  const selectedElementCount = figma.currentPage.selection.length
-  for (const el of figma.currentPage.selection) {
-    if (el.type === "TEXT") {
-      isTextSelected = true
-      break
-    }
+  // get the width a space in the typeface
+  const text = figma.createText()
+  text.characters = word_array[0] + " " + word_array[1]
+  const word_height = text.height
+  const two_word_width = text.width
+  text.characters = word_array[0]
+  const first_word_width = text.width
+  text.characters = word_array[1]
+  const second_word_width = text.width
+  const space_width = two_word_width - first_word_width - second_word_width
+
+  const word_widths = word_array.map((word) => {
+    text.characters = word
+    const word_width = text.width
+    return word_width + space_width
+  })
+
+  text.remove()
+
+  let line_length = 0
+  let index = 0
+  while (line_length < node_width) {
+    line_length += word_widths[index]
+    index++
   }
-  // Send message to UI with selection information
-  figma.ui.postMessage({ selectedElementCount, isTextSelected })
+
+  const first_line = word_array.splice(0, index - 1)
+  const one_line_character_count = first_line.join(" ").length
+  const line_count = Math.floor(node_height / word_height)
+
+  return one_line_character_count * line_count
 }

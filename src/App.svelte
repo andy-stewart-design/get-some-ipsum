@@ -4,10 +4,7 @@
   import Listbox from "./components/Listbox.svelte"
   import { ListboxOption, MessageType } from "./types/main"
 
-  let elementIsSelected: boolean
-  let selectionIsText: boolean
-  $: showUI = elementIsSelected && selectionIsText
-
+  let showUI: boolean
   let amountIsDefault = true
   let amount: number = 25
 
@@ -21,9 +18,8 @@
   const postMsg = (type: MessageType, amount?: number) => parent.postMessage({ pluginMessage: { type, amount } }, "*")
 
   onmessage = (event) => {
-    if (event.data.pluginMessage.selectedElementCount !== undefined) {
-      elementIsSelected = event.data.pluginMessage.selectedElementCount > 0
-      selectionIsText = event.data.pluginMessage.isTextSelected
+    if (event.data.pluginMessage.textNodeCount !== undefined) {
+      showUI = event.data.pluginMessage.textNodeCount > 0
     }
   }
 </script>
