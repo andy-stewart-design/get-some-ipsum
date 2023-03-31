@@ -1,5 +1,8 @@
 // TODO: Check for locked layers
 // TODO: Figure out how to integrate quick actions into plugin
+// TODO: Redo interface to allow for options like:
+// TODO: Switch to turn periods on/off
+// TODO: Select to choose title casing
 
 import { Message } from "./types/main"
 import { generateIpsum } from "./utils/ipsum"
