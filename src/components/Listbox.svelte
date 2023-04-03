@@ -68,7 +68,7 @@
   }
 </script>
 
-<div class="relative grow">
+<div class="relative flex grow">
   <button
     bind:this={listboxButton}
     on:click={toggleOpenState}
@@ -89,7 +89,7 @@
   </button>
   {#if isOpen}
     <div
-      class="absolute top-10 left-0 bg-white dark:bg-figma-gray-900 border border-gray-900/10 dark:border-white/10 shadow-lg w-full z-10 overflow-hidden "
+      class="absolute top-12 left-0 bg-white dark:bg-figma-gray-900 border border-gray-900/10 dark:border-white/10 shadow-lg w-full z-10 overflow-hidden "
       role="listbox"
       aria-orientation="vertical"
       tabindex="0"

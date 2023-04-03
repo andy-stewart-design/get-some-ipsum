@@ -11,9 +11,11 @@ figma.on("run", () => updateActiveSelection())
 
 figma.on("selectionchange", () => updateActiveSelection())
 
-figma.showUI(__html__, { themeColors: true, width: 320, height: 400 })
+figma.showUI(__html__, { themeColors: true, width: 320, height: 320 })
 
 figma.ui.onmessage = async (msg: Message) => {
+  console.log(msg)
+
   const nodes = figma.currentPage.selection
   const textNodes = getTextNodes(nodes)
   await updateTextNodes(msg, textNodes)
@@ -36,7 +38,7 @@ const updateTextNodes = async (msg: Message, nodes: TextNode[]) => {
     const initialOpacity = node.opacity
     node.opacity = 0
 
-    if (msg.type === "AUTO") {
+    if (msg.mode === "AUTO") {
       if (node.textAutoResize === "HEIGHT") {
         // Replace text repeatedly until the height stabilizes
         const initialHeight = node.height
@@ -44,22 +46,22 @@ const updateTextNodes = async (msg: Message, nodes: TextNode[]) => {
 
         let isLooping = true
         while (isLooping) {
-          const ipsum = generateIpsum(msg.type, initialChars.length)
+          const ipsum = generateIpsum(msg, initialChars.length)
           node.characters = ipsum
           const finalHeight = node.height
           if (initialHeight === finalHeight) isLooping = false
         }
       } else if (node.textAutoResize === "NONE" || node.textAutoResize === "TRUNCATE") {
-        const charCount = getFreeformCharCount(node)
-        const ipsum = generateIpsum(msg.type, charCount)
+        const charCount = getFreeformCharCount(node, msg)
+        const ipsum = generateIpsum(msg, charCount)
         node.characters = ipsum
       } else if (node.textAutoResize === "WIDTH_AND_HEIGHT") {
-        const ipsum = generateIpsum(msg.type, node.characters.length)
+        const ipsum = generateIpsum(msg, node.characters.length)
         node.characters = ipsum
       }
-    } else if (msg.type === "WORDS" || msg.type === "CHARACTERS" || msg.type === "PARAGRAPHS") {
+    } else if (msg.mode === "MANUAL") {
       // Replace text with a specific number of words, characters, or paragraphs
-      const ipsum = generateIpsum(msg.type, msg.amount)
+      const ipsum = generateIpsum(msg, msg.amount)
       node.characters = ipsum
     }
     node.opacity = initialOpacity
@@ -78,10 +80,10 @@ const addToast = (nodes: TextNode[]) => {
   return `Updated ${nodes.length} copy block` + (nodes.length > 1 ? "s" : "")
 }
 
-const getFreeformCharCount = (node: TextNode) => {
+const getFreeformCharCount = (node: TextNode, msg: Message) => {
   const node_width = node.width
   const node_height = node.height
-  const ipsum = generateIpsum("AUTO", node_width)
+  const ipsum = generateIpsum(msg, node_width)
   node.characters = ipsum
   const word_array = node.characters.split(" ")
 

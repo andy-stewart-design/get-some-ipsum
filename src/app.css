@@ -7,7 +7,7 @@
 }
 
 .figma-dark {
-  @apply bg-figma-gray-700 text-white;
+  @apply bg-figma-gray-800 text-white;
 }
 
 button:focus,

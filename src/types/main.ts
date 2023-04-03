@@ -1,8 +1,12 @@
-export type MessageType = "WORDS" | "PARAGRAPHS" | "CHARACTERS" | "AUTO"
+export type MessageType = "WORDS" | "PARAGRAPHS" | "CHARACTERS" | undefined
+export type GenerateMode = "AUTO" | "MANUAL"
 
 export interface Message {
   type: MessageType
+  mode: GenerateMode
   amount?: number
+  usePeriods: boolean
+  useTitleCase: boolean
 }
 
 export interface ListboxOption {
