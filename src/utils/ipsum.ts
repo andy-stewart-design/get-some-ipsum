@@ -1,5 +1,5 @@
 import { LoremIpsum } from "lorem-ipsum"
-import { MessageType, GenerateMode, Message } from "../types/main"
+import { Message } from "../types/main"
 
 const lorem = new LoremIpsum({
   sentencesPerParagraph: {
@@ -11,6 +11,8 @@ const lorem = new LoremIpsum({
     min: 4,
   },
 })
+
+const smallWords = /^(a|ac|ad|at|dui|ea|est|et|eu|ex|id|in|non|nom|nec|sed|sem|sit|ut)$/i
 
 export function generateIpsum(msg: Message, amount: number) {
   if (amount) {
@@ -58,26 +60,56 @@ function autoGenerate(maxChars: number, msg: Message) {
 }
 
 function paragraphFromArray(words: string[], msg: Message) {
-  if (msg.usePeriods) {
-    let wordIndex = 0
-    while (wordIndex < words.length) {
-      const max = 14
-      const min = 4
-      const index = Math.floor(Math.random() * (max - min) + min)
-      const sentenceTooLong = wordIndex + index > words.length
-      const tooFewWordsLeft = words.length - (wordIndex + index) < 5
-      if (sentenceTooLong || tooFewWordsLeft) break
-      wordIndex += index
-      words[wordIndex] = words[wordIndex] + "."
+  if (msg.useTitleCase) {
+    const titleCaseWords = words.map((word, i) => {
+      if (smallWords.test(word) && i !== 0) {
+        return word.toLocaleLowerCase()
+      } else return word.charAt(0).toLocaleUpperCase() + word.slice(1).toLocaleLowerCase()
+    })
+    if (msg.usePeriods) {
+      const foobar = createSentences(titleCaseWords)
+      const sentence = foobar.join(" ").replace("..", ".")
+
+      return (
+        sentence
+          .split(". ")
+          .map((s) => {
+            return s.trim().charAt(0).toLocaleUpperCase() + s.slice(1)
+          })
+          .join(". ") + "."
+      )
+    } else {
+      return titleCaseWords.join(" ")
     }
+  } else {
+    if (msg.usePeriods) {
+      const foobar = createSentences(words)
 
-    const sentence = (words.join(" ") + ".").replace("..", ".")
+      const sentence = (foobar.join(" ") + ".").replace("..", ".")
 
-    return sentence
-      .split(". ")
-      .map((s) => {
-        return s.trim().charAt(0).toLocaleUpperCase() + s.slice(1).toLocaleLowerCase()
-      })
-      .join(". ")
-  } else return words.join(" ")
+      return sentence
+        .split(". ")
+        .map((s) => {
+          return s.trim().charAt(0).toLocaleUpperCase() + s.slice(1).toLocaleLowerCase()
+        })
+        .join(". ")
+    } else return words[0].charAt(0).toLocaleUpperCase() + words.join(" ").slice(1).toLocaleLowerCase()
+  }
+}
+
+const createSentences = (words: string[]) => {
+  let wordIndex = 0
+  const max = 14
+  const min = 4
+
+  while (wordIndex < words.length) {
+    const index = Math.floor(Math.random() * (max - min) + min)
+    const sentenceTooLong = wordIndex + index > words.length
+    const tooFewWordsLeft = words.length - (wordIndex + index) < 5
+    if (sentenceTooLong || tooFewWordsLeft) break
+    wordIndex += index
+    words[wordIndex] = words[wordIndex] + "."
+  }
+
+  return words
 }

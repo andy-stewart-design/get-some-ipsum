@@ -1,7 +1,4 @@
 // TODO: Check for locked layers
-// TODO: Redo interface to allow for options like:
-// TODO: Switch to turn periods on/off
-// TODO: Select to choose casing type
 // TODO: Figure out how to integrate quick actions into plugin
 
 import { Message } from "./types/main"
@@ -14,8 +11,6 @@ figma.on("selectionchange", () => updateActiveSelection())
 figma.showUI(__html__, { themeColors: true, width: 320, height: 320 })
 
 figma.ui.onmessage = async (msg: Message) => {
-  console.log(msg)
-
   const nodes = figma.currentPage.selection
   const textNodes = getTextNodes(nodes)
   await updateTextNodes(msg, textNodes)
@@ -30,6 +25,10 @@ figma.ui.onmessage = async (msg: Message) => {
 const updateActiveSelection = () => {
   const textNodeCount = getTextNodes(figma.currentPage.selection).length
   figma.ui.postMessage({ textNodeCount })
+}
+
+const getTextNodes = (nodes: SceneNode[] | readonly SceneNode[]) => {
+  return nodes.filter((n) => n.type === "TEXT") as TextNode[]
 }
 
 const updateTextNodes = async (msg: Message, nodes: TextNode[]) => {
@@ -66,10 +65,6 @@ const updateTextNodes = async (msg: Message, nodes: TextNode[]) => {
     }
     node.opacity = initialOpacity
   }
-}
-
-const getTextNodes = (nodes: SceneNode[] | readonly SceneNode[]) => {
-  return nodes.filter((n) => n.type === "TEXT") as TextNode[]
 }
 
 const loadFonts = async (node: TextNode) => {

@@ -1,45 +1,26 @@
 <script lang="ts">
-  import { setContext } from "svelte"
-  import DescriptionContext from "../description/DescriptionContext.svelte"
-  import LabelContext from "../label/LabelContext.svelte"
+  import { getContext } from "svelte"
   import { getID, SWITCH_CONTEXT } from "../../utils/ui"
   import type { SwitchAPI } from "./types"
+
+  const switchGroupContext = getContext<SwitchAPI>(SWITCH_CONTEXT)
+  const labelID = switchGroupContext ? `nui-${switchGroupContext.groupID}-label` : ""
 
   export let value: boolean
   export { className as class }
   let className = ""
 
   const uuid = getID()
-  const id = `${SWITCH_CONTEXT}-${uuid}`
-
-  function updateValue() {
-    value = !value
-  }
-  function handleKeydown(e: KeyboardEvent): void {
-    if (e.key === " " || e.key === "Enter") {
-      e.preventDefault()
-    }
-    updateValue()
-  }
-  setContext<SwitchAPI>("switchGroupAPI", { groupID: id, updateValue, handleKeydown })
+  const id = switchGroupContext ? `nui-${switchGroupContext.groupID}` : `${SWITCH_CONTEXT}-${uuid}`
 </script>
 
-<DescriptionContext let:describedby>
-  <LabelContext let:labelledby>
-    <slot name="start" />
-    <button
-      on:click|preventDefault={updateValue}
-      {id}
-      role="switch"
-      class={className}
-      type="button"
-      tabindex="0"
-      aria-checked={value}
-      aria-labelledby={labelledby}
-      aria-describedby={describedby}
-    >
-      <slot checked={value} />
-    </button>
-    <slot name="end" />
-  </LabelContext>
-</DescriptionContext>
+<button
+  on:click|preventDefault={() => (value = !value)}
+  {id}
+  role="switch"
+  class={className}
+  aria-checked={value}
+  aria-labelledby={labelID}
+>
+  <slot checked={value} />
+</button>

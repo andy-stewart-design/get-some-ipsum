@@ -1,5 +1,6 @@
 export interface ContextProvider {
   register: (ID: string) => void
+  group: string | undefined
 }
 
 export const DESCR_CONTEXT_NAME = "nui-description"

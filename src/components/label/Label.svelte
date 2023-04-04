@@ -8,18 +8,19 @@
 
   const contextProvider = getContext<ContextProvider>(LABEL_CONTEXT_NAME)
   const uuid = getID()
-  const id = `${LABEL_CONTEXT_NAME}-${uuid}`
+  const id = `nui-${contextProvider.group}-label`
 
   if (!contextProvider) {
     throw new Error("You used a <Description /> component, but it is not inside a relevant parent.")
   }
 
+  const labelFor = `nui-${contextProvider.group}`
   contextProvider.register(uuid)
 </script>
 
-<div {id} class={className} class:sr-only={!visible}>
+<label {id} for={labelFor} class={className} class:sr-only={!visible}>
   <slot />
-</div>
+</label>
 
 <style>
   .sr-only {

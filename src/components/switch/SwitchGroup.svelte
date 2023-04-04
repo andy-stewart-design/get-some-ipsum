@@ -5,29 +5,20 @@
   import { getID, SWITCH_CONTEXT } from "../../utils/ui"
   import type { SwitchAPI } from "./types"
 
-  export let value: boolean
   export { className as class }
   let className = ""
 
   const uuid = getID()
-  const id = `${SWITCH_CONTEXT}-${uuid}`
+  const group = `switch-${uuid}`
+  const id = `switchgroup-${uuid}`
 
-  function updateValue() {
-    value = !value
-  }
-  function handleKeydown(e: KeyboardEvent): void {
-    if (e.key === " " || e.key === "Enter") {
-      e.preventDefault()
-    }
-    updateValue()
-  }
-  setContext<SwitchAPI>("switchGroupAPI", { groupID: id, updateValue, handleKeydown })
+  setContext<SwitchAPI>(SWITCH_CONTEXT, { groupID: group })
 </script>
 
-<DescriptionContext let:describedby>
-  <LabelContext let:labelledby>
-    <div {id} role="radiogroup" aria-labelledby={labelledby} aria-describedby={describedby} class={className}>
+<LabelContext {group} let:labelledby>
+  <DescriptionContext let:describedby>
+    <div {id} aria-labelledby={labelledby} aria-describedby={describedby} class={className}>
       <slot />
     </div>
-  </LabelContext>
-</DescriptionContext>
+  </DescriptionContext>
+</LabelContext>
