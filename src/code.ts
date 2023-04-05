@@ -44,11 +44,14 @@ const updateTextNodes = async (msg: Message, nodes: TextNode[]) => {
         const initialChars = node.characters
 
         let isLooping = true
+        let chars = initialChars.length
         while (isLooping) {
-          const ipsum = generateIpsum(msg, initialChars.length)
+          const ipsum = generateIpsum(msg, chars)
           node.characters = ipsum
           const finalHeight = node.height
           if (initialHeight === finalHeight) isLooping = false
+          else if (initialHeight < finalHeight) chars -= Math.floor(chars / 10)
+          else if (initialHeight > finalHeight) chars += Math.floor(chars / 10)
         }
       } else if (node.textAutoResize === "NONE" || node.textAutoResize === "TRUNCATE") {
         const charCount = getFreeformCharCount(node, msg)

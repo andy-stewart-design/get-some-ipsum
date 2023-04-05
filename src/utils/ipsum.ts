@@ -1,5 +1,5 @@
 import { LoremIpsum } from "lorem-ipsum"
-import { Message } from "../types/main"
+import { MessageType, GenerateMode, Message } from "../types/main"
 
 const lorem = new LoremIpsum({
   sentencesPerParagraph: {
@@ -67,11 +67,11 @@ function paragraphFromArray(words: string[], msg: Message) {
       } else return word.charAt(0).toLocaleUpperCase() + word.slice(1).toLocaleLowerCase()
     })
     if (msg.usePeriods) {
-      const foobar = createSentences(titleCaseWords)
-      const sentence = foobar.join(" ").replace("..", ".")
+      const senteceArray = createSentences(titleCaseWords)
+      const sentences = senteceArray.join(" ").replace("..", ".")
 
       return (
-        sentence
+        sentences
           .split(". ")
           .map((s) => {
             return s.trim().charAt(0).toLocaleUpperCase() + s.slice(1)
@@ -83,11 +83,10 @@ function paragraphFromArray(words: string[], msg: Message) {
     }
   } else {
     if (msg.usePeriods) {
-      const foobar = createSentences(words)
+      const senteceArray = createSentences(words)
+      const sentences = (senteceArray.join(" ") + ".").replace("..", ".")
 
-      const sentence = (foobar.join(" ") + ".").replace("..", ".")
-
-      return sentence
+      return sentences
         .split(". ")
         .map((s) => {
           return s.trim().charAt(0).toLocaleUpperCase() + s.slice(1).toLocaleLowerCase()

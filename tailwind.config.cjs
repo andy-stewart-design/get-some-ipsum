@@ -1,6 +1,7 @@
 /** @type {import('tailwindcss').Config} */
 
 const plugin = require("tailwindcss/plugin")
+const colors = require("tailwindcss/colors")
 
 module.exports = {
   darkMode: ["class", ".figma-dark"],
@@ -25,6 +26,7 @@ module.exports = {
             900: "#1e1e1e",
           },
         },
+        foreground: "",
       },
       keyframes: {
         cursor: {
@@ -41,8 +43,6 @@ module.exports = {
   plugins: [
     plugin(({ addVariant }) => {
       addVariant("active", ".active&")
-    }),
-    plugin(({ addVariant }) => {
       addVariant("selection", "&::selection")
     }),
   ],

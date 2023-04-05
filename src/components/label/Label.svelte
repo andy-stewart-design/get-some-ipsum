@@ -2,7 +2,7 @@
   import { getID, LABEL_CONTEXT_NAME, type ContextProvider } from "../../utils/ui"
   import { getContext } from "svelte"
 
-  export let visible = false
+  export let hidden = false
   export { className as class }
   let className: string = ""
 
@@ -18,7 +18,7 @@
   contextProvider.register(uuid)
 </script>
 
-<label {id} for={labelFor} class={className} class:sr-only={!visible}>
+<label {id} for={labelFor} class={className} class:sr-only={hidden}>
   <slot />
 </label>
 
