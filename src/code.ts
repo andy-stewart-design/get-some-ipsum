@@ -1,8 +1,12 @@
+// TODO: Figure out why it is hanging when you try to autogenerate with a small amount of text in a large frame
+// TODO: Fix bug where generation is produing 1 word when <20 words are requested
 // TODO: Check for locked layers
 // TODO: Figure out how to integrate quick actions into plugin
 
 import { Message } from "./types/main"
 import { generateIpsum } from "./utils/ipsum"
+
+console.log("in dev mode")
 
 figma.on("run", () => updateActiveSelection())
 

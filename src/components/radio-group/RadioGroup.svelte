@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { getID, RADIO_GROUP_CONTEXT } from "../../utils/ui"
+  import { getID, LIB_PREFIX, RADIO_GROUP_CONTEXT } from "../../utils/ui"
   import { onDestroy, setContext, createEventDispatcher } from "svelte"
   import { writable } from "svelte/store"
   import DescriptionContext from "../description/DescriptionContext.svelte"
@@ -19,8 +19,10 @@
   let activeIndex = writable(0)
   let options: OptionsArray[] = []
 
+  const role = "radiogroup"
   const uuid = getID()
-  const id = `${RADIO_GROUP_CONTEXT}-${uuid}`
+  const group = `${role}-${uuid}`
+  const id = `${LIB_PREFIX}-${group}`
 
   function setFocus(): void {
     options[$activeIndex].node?.focus()
@@ -61,7 +63,7 @@
   }
 
   const api = {
-    groupID: uuid,
+    groupID: group,
     activeIndex,
     activeValue,
     registerOption,
@@ -76,10 +78,10 @@
   onDestroy(() => (options = []))
 </script>
 
-<DescriptionContext let:describedby>
-  <LabelContext let:labelledby>
+<LabelContext {group} let:labelledby>
+  <DescriptionContext {group} let:describedby>
     <div {id} role="radiogroup" aria-labelledby={labelledby} aria-describedby={describedby} class={className}>
       <slot />
     </div>
-  </LabelContext>
-</DescriptionContext>
+  </DescriptionContext>
+</LabelContext>

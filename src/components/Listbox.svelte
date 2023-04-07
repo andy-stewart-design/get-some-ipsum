@@ -72,7 +72,7 @@
   <button
     bind:this={listboxButton}
     on:click={toggleOpenState}
-    class="relative flex w-full items-center text-left py-1.5 px-2 border border-gray-900/10 dark:border-white/10 focus-visible:border-blue-600 dark:focus-visible:border-blue-600  active:border-blue-600 dark:active:border-blue-600"
+    class="relative flex w-full items-center text-left py-1.5 px-2 border border-gray-900/10 dark:border-white/10 select-none focus-visible:border-blue-600 dark:focus-visible:border-blue-600 active:border-blue-600 dark:active:border-blue-600"
     class:active={isOpen}
     type="button"
     aria-haspopup="true"
@@ -89,7 +89,7 @@
   </button>
   {#if isOpen}
     <div
-      class="absolute top-12 left-0 bg-white dark:bg-figma-gray-900 border border-gray-900/10 dark:border-white/10 shadow-lg w-full z-10 overflow-hidden "
+      class="absolute top-12 left-0 bg-white dark:bg-figma-gray-900 border border-gray-900/10 dark:border-white/10 shadow-lg w-full z-10 overflow-hidden"
       role="listbox"
       aria-orientation="vertical"
       tabindex="0"

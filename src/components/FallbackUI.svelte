@@ -13,7 +13,7 @@
       stroke-dasharray="8 8"
     />
   </svg>
-  <p class="text-xs text-gray-900/60 dark:text-white/60 text-center max-w-[160px]">
+  <p class="text-xs text-gray-900/60 dark:text-white/60 text-center max-w-[160px] select-none">
     Select at least one text layer to update
   </p>
 </div>

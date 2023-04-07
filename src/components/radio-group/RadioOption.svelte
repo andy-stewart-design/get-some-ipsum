@@ -1,7 +1,7 @@
 <script lang="ts">
   import { getContext, onMount } from "svelte"
-  import { getID, RADIO_GROUP_CONTEXT } from "../../utils/ui"
-  import DescriptionContext from "../description/DescriptionContext.svelte"
+  import { getID, LIB_PREFIX, RADIO_GROUP_CONTEXT } from "../../utils/ui"
+  // import DescriptionContext from '../description/DescriptionContext.svelte';
   import LabelContext from "../label/LabelContext.svelte"
   import type { RadioGroupAPI } from "./types"
 
@@ -21,7 +21,9 @@
   let optionRef: HTMLElement
 
   const uuid = getID()
-  const id = `${RADIO_GROUP_CONTEXT}-${groupID}-${role}-${uuid}`
+  const group = `${role}-${uuid}`
+  const id = `${LIB_PREFIX}-${groupID}-${group}`
+  // const id = `${RADIO_GROUP_CONTEXT}-${groupID}-${role}-${uuid}`;
 
   if (index < 0) index = radioGroupAPI.registerOption(uuid, value)
   else radioGroupAPI.registerOption(uuid, value)
@@ -39,22 +41,22 @@
   })
 </script>
 
-<DescriptionContext let:describedby>
-  <LabelContext let:labelledby>
-    <div
-      bind:this={optionRef}
-      on:click|preventDefault={() => setActive(index, value)}
-      on:keydown={radioGroupAPI.handleClick}
-      {id}
-      role="radio"
-      aria-checked={checked}
-      tabindex={checked ? 0 : -1}
-      aria-labelledby={labelledby}
-      aria-describedby={describedby}
-      class={className}
-      style:cursor="pointer"
-    >
-      <slot {checked} />
-    </div>
-  </LabelContext>
-</DescriptionContext>
+<!-- <DescriptionContext let:describedby> -->
+<LabelContext {group} let:labelledby>
+  <div
+    bind:this={optionRef}
+    on:click|preventDefault={() => setActive(index, value)}
+    on:keydown={radioGroupAPI.handleClick}
+    {id}
+    role="radio"
+    aria-checked={checked}
+    tabindex={checked ? 0 : -1}
+    aria-labelledby={labelledby}
+    class={className}
+    style:cursor="pointer"
+  >
+    <slot {checked} />
+  </div>
+</LabelContext>
+<!-- </DescriptionContext> -->
+<!-- aria-describedby={describedby} -->
