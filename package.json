@@ -1,6 +1,6 @@
 {
   "name": "figma-plugin-svelte-example",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "main": "index.js",
   "author": "LekoArts <lekoarts@gmail.com>",
   "license": "MIT",

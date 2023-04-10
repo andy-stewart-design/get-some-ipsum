@@ -1,12 +1,13 @@
-// TODO: Figure out why it is hanging when you try to autogenerate with a small amount of text in a large frame
-// TODO: Fix bug where generation is produing 1 word when <20 words are requested
-// TODO: Check for locked layers
-// TODO: Figure out how to integrate quick actions into plugin
+// TODO: Check for locked layers (LOW)
+// TODO: Figure out how to make freeform autogeneration more accurate (LOW)
+// TODO: Figure out how to integrate quick actions into plugin (Next Version)
 
 import { Message } from "./types/main"
-import { generateIpsum } from "./utils/ipsum"
+import { getTextNodes, loadFonts, updateActiveSelection, addToast } from "./utils/figma"
+import { lorem, generateCharacters } from "./utils/ipsum"
+import { formatSentences, getFreeformCharCount } from "./utils/text"
 
-console.log("in dev mode")
+console.clear()
 
 figma.on("run", () => updateActiveSelection())
 
@@ -17,107 +18,57 @@ figma.showUI(__html__, { themeColors: true, width: 320, height: 320 })
 figma.ui.onmessage = async (msg: Message) => {
   const nodes = figma.currentPage.selection
   const textNodes = getTextNodes(nodes)
-  await updateTextNodes(msg, textNodes)
 
-  figma.closePlugin(addToast(textNodes))
-}
-
-// -----------------------------------------------------------------
-// HELPER FUNCTIONS
-// -----------------------------------------------------------------
-
-const updateActiveSelection = () => {
-  const textNodeCount = getTextNodes(figma.currentPage.selection).length
-  figma.ui.postMessage({ textNodeCount })
-}
-
-const getTextNodes = (nodes: SceneNode[] | readonly SceneNode[]) => {
-  return nodes.filter((n) => n.type === "TEXT") as TextNode[]
-}
-
-const updateTextNodes = async (msg: Message, nodes: TextNode[]) => {
-  for (const node of nodes) {
+  for (const node of textNodes) {
     await loadFonts(node)
-    const initialOpacity = node.opacity
-    node.opacity = 0
-
     if (msg.mode === "AUTO") {
       if (node.textAutoResize === "HEIGHT") {
-        // Replace text repeatedly until the height stabilizes
-        const initialHeight = node.height
-        const initialChars = node.characters
-
         let isLooping = true
-        let chars = initialChars.length
+        let initialChars = node.characters.length
+        const initialHeight = node.height
         while (isLooping) {
-          const ipsum = generateIpsum(msg, chars)
+          const ipsumArray = generateCharacters(initialChars)
+          const ipsum = formatSentences(ipsumArray, msg)
           node.characters = ipsum
           const finalHeight = node.height
           if (initialHeight === finalHeight) isLooping = false
-          else if (initialHeight < finalHeight) chars -= Math.floor(chars / 10)
-          else if (initialHeight > finalHeight) chars += Math.floor(chars / 10)
+          else if (initialHeight < finalHeight) initialChars -= Math.floor(initialChars / 10)
+          else if (initialHeight > finalHeight) initialChars += Math.floor(initialChars / 10)
         }
       } else if (node.textAutoResize === "NONE" || node.textAutoResize === "TRUNCATE") {
-        const charCount = getFreeformCharCount(node, msg)
-        const ipsum = generateIpsum(msg, charCount)
+        const charCount = await getFreeformCharCount(node, msg)
+        const ipsumArray = generateCharacters(charCount)
+        const ipsum = formatSentences(ipsumArray, msg)
         node.characters = ipsum
+        // TODO: Figure out how to make this more accurate (LOW)
       } else if (node.textAutoResize === "WIDTH_AND_HEIGHT") {
-        const ipsum = generateIpsum(msg, node.characters.length)
+        const ipsumArray = generateCharacters(node.characters.length)
+        const ipsum = formatSentences(ipsumArray, msg)
         node.characters = ipsum
       }
     } else if (msg.mode === "MANUAL") {
-      // Replace text with a specific number of words, characters, or paragraphs
-      const ipsum = generateIpsum(msg, msg.amount)
-      node.characters = ipsum
+      if (!msg.amount) console.error(`Get Some Ipsum: must provide amount to generate ${msg.type.toLocaleLowerCase()}`)
+      if (msg.type === "WORDS") {
+        const result = lorem.generateWords(msg.amount)
+        const ipsumArray = result.split(" ")
+        const ipsum = formatSentences(ipsumArray, msg)
+        node.characters = ipsum
+      } else if (msg.type === "PARAGRAPHS") {
+        const paragraphArray = lorem.generateParagraphs(msg.amount).split(/\r?\n|\r|\n/g)
+        const ipsum = paragraphArray.map((paragraph) => {
+          const ipsumArray = paragraph.replaceAll(".", "").split(" ")
+          console.log(ipsumArray)
+
+          return formatSentences(ipsumArray, msg)
+        })
+        node.characters = ipsum.join("\n\n")
+      } else if (msg.type === "CHARACTERS") {
+        const ipsumArray = generateCharacters(msg.amount)
+        const ipsum = formatSentences(ipsumArray, msg)
+        node.characters = ipsum
+      }
     }
-    node.opacity = initialOpacity
-  }
-}
-
-const loadFonts = async (node: TextNode) => {
-  await Promise.all(node.getRangeAllFontNames(0, node.characters.length).map(figma.loadFontAsync))
-}
-
-const addToast = (nodes: TextNode[]) => {
-  return `Updated ${nodes.length} copy block` + (nodes.length > 1 ? "s" : "")
-}
-
-const getFreeformCharCount = (node: TextNode, msg: Message) => {
-  const node_width = node.width
-  const node_height = node.height
-  const ipsum = generateIpsum(msg, node_width)
-  node.characters = ipsum
-  const word_array = node.characters.split(" ")
-
-  // get the width a space in the typeface
-  const text = figma.createText()
-  text.characters = word_array[0] + " " + word_array[1]
-  const word_height = text.height
-  const two_word_width = text.width
-  text.characters = word_array[0]
-  const first_word_width = text.width
-  text.characters = word_array[1]
-  const second_word_width = text.width
-  const space_width = two_word_width - first_word_width - second_word_width
-
-  const word_widths = word_array.map((word) => {
-    text.characters = word
-    const word_width = text.width
-    return word_width + space_width
-  })
-
-  text.remove()
-
-  let line_length = 0
-  let index = 0
-  while (line_length < node_width) {
-    line_length += word_widths[index]
-    index++
   }
 
-  const first_line = word_array.splice(0, index - 1)
-  const one_line_character_count = first_line.join(" ").length
-  const line_count = Math.floor(node_height / word_height)
-
-  return one_line_character_count * line_count
+  figma.closePlugin(addToast(textNodes))
 }

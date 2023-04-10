@@ -1,4 +1,5 @@
 <script lang="ts">
+  // TODO: Make into components
   // TODO: simplify TW theme colors
   import "./app.css"
   import FallbackUi from "./components/FallbackUI.svelte"
@@ -72,31 +73,31 @@
     <div class="grow flex flex-col gap-4 w-full p-4 pt-0">
       <div class="flex h-12">
         {#if generateMode === "MANUAL"}
-          <div class="flex h-full w-full gap-1">
-            <NumberGroup bind:value={amount} class="flex flex-col gap-2 w-28">
+          <div class="flex h-full w-full gap-2">
+            <NumberGroup
+              bind:value={amount}
+              class="flex flex-col gap-2 w-24"
+              on:change={() => amountIsDefault && (amountIsDefault = false)}
+            >
               <NumberLabel hidden>Amount</NumberLabel>
               <div class="grow flex relative">
-                <NumberInput class="bg-transparent border border-gray-900/10 dark:border-white/10 w-full py-2 px-2.5" />
-                <div class="absolute top-0 right-0 flex h-full pr-2">
-                  <NumberDecrement class="grow flex items-center py-1 px-2">
-                    <svg viewBox="0 0 12 12" width="12" height="12">
-                      <path d="M1 6 L11 6" stroke="currentColor" stroke-width="1.25" />
-                    </svg>
-                  </NumberDecrement>
-                  <NumberIncrement class="grow flex items-center p-1">
+                <NumberInput class="bg-transparent border border-gray-900/10 dark:border-white/10 w-full py-2 px-3" />
+                <div class="absolute top-0 right-0 flex flex-col h-full">
+                  <NumberIncrement
+                    class="grow flex items-center px-2 border-b border-l border-gray-900/10 dark:border-white/10"
+                  >
                     <svg viewBox="0 0 12 12" width="12" height="12">
                       <path d="M1 6 L11 6 M6 1 L6 11" stroke="currentColor" stroke-width="1.25" />
                     </svg>
                   </NumberIncrement>
+                  <NumberDecrement class="grow flex items-center px-2 border-l border-gray-900/10 dark:border-white/10">
+                    <svg viewBox="0 0 12 12" width="12" height="12">
+                      <path d="M1 6 L11 6" stroke="currentColor" stroke-width="1.25" />
+                    </svg>
+                  </NumberDecrement>
                 </div>
               </div>
             </NumberGroup>
-            <!-- <input
-              class="w-20 bg-transparent border border-gray-900/10 dark:border-white/10 px-2 focus-visible:border-blue-500 dark:focus-visible:border-blue-600 selection:bg-blue-500"
-              type="number"
-              bind:value={amount}
-              on:input={() => amountIsDefault && (amountIsDefault = false)}
-            /> -->
             <Listbox
               bind:selectedItem
               on:change={() => amountIsDefault && (amount = selectedItem.defaultAmount)}
