@@ -1,7 +1,6 @@
 /** @type {import('tailwindcss').Config} */
 
 const plugin = require("tailwindcss/plugin")
-const colors = require("tailwindcss/colors")
 
 module.exports = {
   darkMode: ["class", ".figma-dark"],
