@@ -50,6 +50,7 @@
     {id}
     role="radio"
     aria-checked={checked}
+    data-selected={checked}
     tabindex={checked ? 0 : -1}
     aria-labelledby={labelledby}
     class={className}

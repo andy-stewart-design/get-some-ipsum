@@ -3,15 +3,15 @@
 @tailwind utilities;
 
 .figma-light {
-  @apply antialiased bg-white text-gray-900;
+	@apply bg-white text-gray-900 antialiased;
 }
 
 .figma-dark {
-  @apply antialiased bg-figma-gray-800 text-white;
+	@apply bg-figma-gray-800 text-gray-100 antialiased;
 }
 
 button:focus,
 input:focus,
 div:focus {
-  @apply outline-none;
+	@apply outline-none;
 }
