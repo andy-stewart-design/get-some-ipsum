@@ -73,16 +73,16 @@
 						>
 							<NumberLabel hidden>Amount</NumberLabel>
 							<div class="relative flex grow">
-								<NumberInput class="w-full border border-gray-900/10 bg-transparent px-3 py-2 dark:border-white/10" />
-								<div class="absolute right-0 top-0 flex h-full flex-col">
+								<NumberInput class="w-full border border-gray-900/10 bg-transparent px-3 py-2 dark:border-white/20" />
+								<div class="absolute bottom-px right-px top-px flex flex-col">
 									<NumberIncrement
-										class="flex grow items-center border-b border-l border-gray-900/10 px-2 dark:border-white/10"
+										class="flex grow items-center border-b border-l border-gray-900/10 px-2 dark:border-white/20"
 									>
 										<svg viewBox="0 0 12 12" width="12" height="12">
 											<path d="M1 6 L11 6 M6 1 L6 11" stroke="currentColor" stroke-width="1.25" />
 										</svg>
 									</NumberIncrement>
-									<NumberDecrement class="flex grow items-center border-l border-gray-900/10 px-2 dark:border-white/10">
+									<NumberDecrement class="flex grow items-center border-l border-gray-900/10 px-2 dark:border-white/20">
 										<svg viewBox="0 0 12 12" width="12" height="12">
 											<path d="M1 6 L11 6" stroke="currentColor" stroke-width="1.25" />
 										</svg>
@@ -97,7 +97,7 @@
 						/>
 					</div>
 				{:else}
-					<div class="flex grow items-center justify-center border border-gray-900/10 px-2 dark:border-white/10">
+					<div class="flex grow items-center justify-center border border-gray-900/10 px-2 dark:border-white/20">
 						<p class="max-w-[248px] select-none text-center text-xs">
 							Automatically generate the perfect amount of copy to fit the text layer’s frame
 						</p>
@@ -139,7 +139,7 @@
 			class="flex w-full flex-col items-center justify-center gap-4 border-t border-gray-900/10 p-4 dark:border-white/10"
 		>
 			<button
-				class="w-full border border-figma-gray-900/10 px-2 py-3 font-semibold text-figma-gray-900 transition-colors ease-out hover:bg-figma-gray-900 hover:text-gray-100 focus-visible:outline-1 focus-visible:outline-blue-500 dark:border-gray-100/10 dark:text-gray-100 dark:hover:bg-gray-100 dark:hover:text-figma-gray-900"
+				class="w-full border border-figma-gray-900/20 bg-white px-2 py-3 font-semibold text-figma-gray-900 transition-colors ease-out hover:bg-figma-gray-900 hover:text-gray-100 focus-visible:outline-1 focus-visible:outline-blue-500 dark:border-gray-100/20 dark:bg-gray-100/10 dark:text-gray-100 dark:hover:bg-gray-100 dark:hover:text-figma-gray-900"
 				on:click={postMsg}
 			>
 				Generate

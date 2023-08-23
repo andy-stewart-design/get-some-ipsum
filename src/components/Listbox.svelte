@@ -72,7 +72,7 @@
 	<button
 		bind:this={listboxButton}
 		on:click={toggleOpenState}
-		class="relative flex w-full select-none items-center border border-gray-900/10 px-3 py-1.5 text-left focus-visible:border-blue-600 active:border-figma-gray-900 dark:border-white/10 dark:focus-visible:border-blue-600 dark:active:border-gray-100"
+		class="relative flex w-full select-none items-center border border-gray-900/10 px-3 py-1.5 text-left focus-visible:border-blue-600 active:border-figma-gray-900 dark:border-white/20 dark:focus-visible:border-blue-600 dark:active:border-gray-100"
 		class:active={isOpen}
 		type="button"
 		aria-haspopup="true"
@@ -117,6 +117,6 @@
 
 <style lang="postcss">
 	.item-active {
-		@apply bg-figma-gray-700 text-white;
+		@apply bg-gray-200 text-figma-gray-700;
 	}
 </style>
